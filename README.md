@@ -265,7 +265,6 @@ Przykładowe pola:
 - `insert(z)`
 - `observeAll()`
 - `deleteAll()`
-- opcjonalnie: `getById(id)` jeśli potrzebujesz
 
 ---
 

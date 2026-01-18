@@ -530,6 +530,7 @@ Projekt spełnia założenia PAM poprzez:
 
 ## 📸 20. Screeny w README
 
+![Dashboard](screenshoty/screenuprawnienaparatu.png)
 
 ---
 

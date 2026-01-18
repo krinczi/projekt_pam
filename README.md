@@ -1,293 +1,244 @@
-# 📱 Sensor Logger (Projekt PAM) – pełna dokumentacja projektu
+# 📱 Sensor Logger (Projekt PAM) – Dokumentacja techniczna (README)
 
-Aplikacja mobilna na Androida wykonana w ramach projektu z przedmiotu **Programowanie urządzeń mobilnych (PAM)**.  
-Projekt wykorzystuje sensory telefonu, zapisuje dane w bazie **Room**, wykonuje ich przetwarzanie (statystyki i alerty) oraz prezentuje wyniki w formie dashboardu, historii i stref z limitami.
-
-> **Sensor Logger** = dziennik pomiarów: hałas + ruch + lokalizacja (+ opcjonalne zdjęcie)  
-> Działa offline, ma nowoczesny UI i jest gotowy do pokazania jako projekt “produkcyjny”, a nie lab.
+> Aplikacja mobilna na Androida wykonana w ramach przedmiotu **Programowanie urządzeń mobilnych (PAM)**.  
+> Projekt pokazuje realne użycie sensorów urządzenia, przetwarzanie danych, zapis do bazy **Room** oraz prezentację danych w nowoczesnym UI w **Jetpack Compose (Material 3)**.
 
 ---
 
-## 📌 Spis treści
+## 📌 1. Streszczenie projektu
 
-1. [Opis projektu](#-opis-projektu)  
-2. [Cel projektu i założenia](#-cel-projektu-i-założenia)  
-3. [Zakres funkcjonalny](#-zakres-funkcjonalny)  
-4. [Dane i sensory (źródła danych)](#-dane-i-sensory-źródła-danych)  
-5. [Przetwarzanie danych i logika alertów](#-przetwarzanie-danych-i-logika-alertów)  
-6. [Architektura projektu (MVVM)](#-architektura-projektu-mvvm)  
-7. [Struktura projektu i pliki](#-struktura-projektu-i-pliki)  
-8. [Baza danych Room](#-baza-danych-room)  
-9. [UI/UX – opis ekranów](#-uiux--opis-ekranów)  
-10. [Nawigacja](#-nawigacja)  
-11. [Uprawnienia i zgodność sprzętowa](#-uprawnienia-i-zgodność-sprzętowa)  
-12. [Zdjęcia i FileProvider](#-zdjęcia-i-fileprovider)  
-13. [Eksport CSV](#-eksport-csv)  
-14. [Testowanie aplikacji (scenariusze)](#-testowanie-aplikacji-scenariusze)  
-15. [Build APK i uruchomienie](#-build-apk-i-uruchomienie)  
-16. [Typowe problemy i rozwiązania](#-typowe-problemy-i-rozwiązania)  
-17. [Rozwój projektu (pomysły na wersję 2.0)](#-rozwój-projektu-pomysły-na-wersję-20)  
-18. [Podsumowanie zgodności z wymaganiami PAM](#-podsumowanie-zgodności-z-wymaganiami-pam)  
-19. [Screenshots](#-screenshots)  
+**Sensor Logger** to aplikacja do monitorowania warunków otoczenia i zachowania telefonu w czasie.  
+Użytkownik może:
 
----
+- podglądać sensory **LIVE** (GPS + mikrofon + akcelerometr),
+- zapisywać pomiary (z opcjonalnym zdjęciem),
+- tworzyć własne **strefy** (np. Dom, Praca) na podstawie GPS,
+- mieć automatyczne wykrywanie, czy jest **w strefie**,
+- dostawać **alerty**, gdy przekroczone zostaną progi,
+- przeglądać historię oraz filtrować tylko alerty,
+- eksportować historię pomiarów do pliku **CSV** i udostępnić go dalej.
 
-## 🧾 Opis projektu
-
-**Sensor Logger** to aplikacja typu **offline-first**, która rejestruje dane z sensorów telefonu i zapisuje je jako rekordy pomiarowe.  
-Każdy pomiar zawiera:
-
-- czas wykonania,
-- lokalizację GPS (lat/lon),
-- poziom hałasu (db-ish),
-- poziom ruchu (|a| z akcelerometru),
-- przypisaną strefę (jeśli użytkownik był w jej obszarze),
-- opcjonalne zdjęcie (URI).
-
-Aplikacja pozwala tworzyć strefy (np. Dom/Uczelnia/Praca) z progami komfortu:
-- maksymalny hałas,
-- maksymalny ruch,
-- promień.
-
-Jeżeli pomiar przekroczy limit w danej strefie, zostaje oznaczony jako **ALERT**.
+Projekt jest zaprojektowany tak, aby wyglądał jak **prawdziwa aplikacja projektowa**, a nie jak “labka”, dlatego UI zawiera:
+- spójne karty,
+- chipy statusowe,
+- czytelny dashboard,
+- wykres,
+- filtr alertów,
+- sekcję “Najgłośniejszy pomiar dnia”.
 
 ---
 
-## 🎯 Cel projektu i założenia
+## 🎯 2. Cel projektu i zgodność z wymaganiami
 
-### Cel główny
-Celem projektu było stworzenie aplikacji mobilnej, która:
-- wykorzystuje sensory telefonu (min. 3 źródła danych),
-- zapisuje pomiary w bazie lokalnej,
-- przetwarza dane i wyznacza alerty,
-- prezentuje dane w atrakcyjnej formie UI/UX.
+### ✅ Wymagania funkcjonalne (cel PAM)
+Aplikacja:
 
-### Założenia projektowe
-Projekt został wykonany tak, aby:
-- działał na **minSdk 24**,
-- działał offline (brak backendu i chmury),
-- posiadał nowoczesny wygląd (Material 3, karty, chipy, statystyki),
-- był intuicyjny (3 główne zakładki + opcjonalne szczegóły),
-- zawierał “miłe UX bajery” wymagane w projekcie.
+- ✅ wykorzystuje **min. 3 źródła danych / sensory**
+- ✅ zapisuje dane lokalnie do bazy
+- ✅ wykonuje **przetwarzanie danych (statystyki, alerty)**
+- ✅ prezentuje dane w intuicyjnym UI
+- ✅ pozwala na interakcję użytkownika (strefy, zapis, filtr, eksport)
+- ✅ działa offline (wszystko lokalnie)
 
----
+### ✅ Wykorzystane źródła danych
+Projekt wykorzystuje więcej niż wymagane minimum:
 
-## ✅ Zakres funkcjonalny
-
-### Funkcje obowiązkowe
-- ✅ pobieranie danych z sensorów (min. 3)
-- ✅ zapis danych do bazy Room
-- ✅ historia zapisów
-- ✅ przetwarzanie danych (statystyki, alerty)
-- ✅ UI/UX “atrakcyjna prezentacja”
-
-### Funkcje dodatkowe / UX
-- ✅ statystyki dnia (min/max/avg hałasu)
-- ✅ licznik alertów “dzisiaj”
-- ✅ “Najgłośniejszy pomiar dnia” (z godziną, strefą i miniaturą zdjęcia)
-- ✅ filtr “Tylko alerty 🚨” w historii
-- ✅ alerty dziś per strefa
-- ✅ wykres hałasu (MiniChart)
-- ✅ eksport CSV
-- ✅ zdjęcie do pomiaru
+1. **GPS / Lokalizacja** (lat/lon)
+2. **Mikrofon** (przybliżony poziom dźwięku: “db-ish”)
+3. **Akcelerometr** (moduł przyspieszenia `|a|`)
+4. **Kamera** (opcjonalne zdjęcie do rekordu)
+5. **Pamięć urządzenia** (Room DB)
+6. **Eksport CSV** (plik + FileProvider)
 
 ---
 
-## 📡 Dane i sensory (źródła danych)
+## 🧭 3. Opis ekranów i UX (User Experience)
 
-Aplikacja korzysta z co najmniej 3 źródeł danych:
+Aplikacja działa w logice:  
+**Dashboard → Zapis pomiaru → Historia → Analiza / Alerty → Strefy**
 
-### 1) GPS / Lokalizacja (Location)
-**Dane:**
-- `lat: Double?`
-- `lon: Double?`
-
-**Zastosowanie:**
-- zapis w rekordzie pomiaru,
-- wykrycie aktywnej strefy,
-- przypisanie pomiaru do `zoneId`.
+Wszystkie kluczowe akcje są pod ręką i nie wymagają przekopywania się przez menu.
 
 ---
 
-### 2) Mikrofon (Noise level / db-ish)
-**Dane:**
-- `soundDbApprox: Double`
+### 🟣 3.1 Dashboard (ekran główny)
 
-**Opis:**
-Pomiar “db-ish” to wartość orientacyjna (nie laboratoryjne dB), ale działa świetnie do:
-- wykrywania “głośno/cicho”,
-- progów stref,
-- porównywania pomiarów w czasie.
+Dashboard to “centrum dowodzenia” – pokazuje dane live, przetworzone statystyki i najważniejsze akcje.
 
----
+#### Sekcje Dashboardu:
 
-### 3) Akcelerometr (Motion)
-**Dane:**
-- `accelMagnitude: Double`
+**(A) Header**
+- nazwa “Dashboard”
+- szybkie ikonki nawigacyjne: **Strefy** i **Historia**
 
-**Opis:**
-Wartość opisuje intensywność ruchu.  
-Może być interpretowana jako:
-- spokój (mała wartość),
-- chodzenie / drgania (średnia),
-- bieganie / wstrząsy (duża).
+**(B) Status Pills**
+- aktywna strefa: `📍 Dom / Poza strefą`
+- status: `✅ OK` / `🚨 ALERT`
 
----
+**(C) Live sensory**
+- GPS: `lat/lon`
+- Hałas: `soundDbApprox` (db-ish)
+- Ruch: `accelMagnitude` (`|a|`)
 
-### 4) Kamera (opcjonalnie)
-**Dane:**
-- `photoUri: String?`
+**(D) Statystyki dnia (min/max/avg)**
+- liczba zapisów dzisiaj
+- liczba alertów dzisiaj
+- AVG / MIN / MAX hałasu
 
-**Zastosowanie:**
-- dołączenie zdjęcia jako kontekst sytuacji (np. “co się działo przy tym pomiarze”).
+**(E) Najgłośniejszy pomiar dnia (UX “bajer”)**
+- godzina
+- dB
+- strefa
+- miniatura zdjęcia (jeśli jest)
+- kliknięcie może przenosić do szczegółów (jeśli używasz Detail)
 
----
+**(F) Wykres hałasu (ostatnie 20 zapisów)**
+- mini wykres w Compose
+- pomaga wizualnie zrozumieć trend
 
-### 5) Dane lokalne / Room
-**Zastosowanie:**
-- trwałość danych,
-- historia,
-- filtrowanie,
-- przeliczanie alertów.
+**(G) Akcje**
+- `Zapisz pomiar` (bez zdjęcia)
+- `Foto + zapis` (kamera)
+- `Eksport CSV`
 
----
+#### Logika przewijania (scroll)
+Jeżeli Dashboard jest “ciężki” do scrollowania, zalecane jest:
+- użyć `LazyColumn` zamiast `Column`
+- albo `Column(modifier = Modifier.verticalScroll(rememberScrollState()))`
 
-## 🧠 Przetwarzanie danych i logika alertów
-
-### 1) Wykrywanie aktywnej strefy
-Jeśli telefon znajduje się w promieniu strefy, staje się ona **activeZone**.
-
-W uproszczeniu:
-- obliczana jest odległość od środka strefy,
-- porównanie do `radiusMeters`.
+W projekcie można łatwo przełączyć na `LazyColumn`, aby UI było płynniejsze na słabszych telefonach.
 
 ---
 
-### 2) Logika alertu
-Pomiar jest **ALERT**, gdy:
-- ma przypisaną strefę `zoneId`  
-i dodatkowo:
-- hałas przekroczył limit strefy  
-**lub**
-- ruch przekroczył limit strefy
+### 🟣 3.2 Historia pomiarów
 
-**Warunek:**
-```
-ALERT = (soundDbApprox > zone.maxNoiseDb) OR (accelMagnitude > zone.maxAccel)
-```
+Historia to lista pomiarów w kolejności od najnowszego. Każdy rekord ma:
 
----
+- strefę (chip)
+- status `OK` / `ALERT`
+- czas zapisu
+- GPS
+- dB
+- |a|
+- miniaturę zdjęcia (jeśli dodane)
 
-### 3) Statystyki dnia (UX feature)
-Na Dashboardzie liczone są statystyki dla pomiarów z dzisiejszego dnia:
-- liczba zapisów
-- liczba alertów
-- AVG hałasu
-- MIN hałasu
-- MAX hałasu
+#### Filtr “Tylko alerty 🚨”
+Przełącznik `Switch`:
 
-Dzień liczony jest od 00:00 (bez użycia API 26 `java.time`):
-- użyto `Calendar` (zgodne z minSdk 24)
+- OFF → pokazuje wszystkie rekordy
+- ON → pokazuje tylko pomiary, które przekroczyły progi stref
+
+To daje natychmiastową wartość UX, bo użytkownik widzi tylko “problemy”.
+
+#### Eksport CSV
+Historia umożliwia eksport aktualnie wyświetlonej listy (czyli z filtrem lub bez).
 
 ---
 
-### 4) Najgłośniejszy pomiar dnia (UX feature)
-Dashboard wybiera rekord o największym `soundDbApprox` w dzisiejszych danych i pokazuje:
-- godzinę,
-- wartość dB,
-- nazwę strefy,
-- miniaturę zdjęcia (jeśli istnieje).
+### 🟣 3.3 Strefy
+
+Strefy to funkcja “bardziej projektowa”, bo wprowadza logikę przestrzenną.
+
+Użytkownik może dodać strefę na podstawie aktualnego GPS i ustawić progi:
+
+- nazwa
+- promień (m)
+- max hałas
+- max ruch
+
+#### Lista stref zawiera:
+- nazwę strefy
+- promień
+- progi
+- status aktywności (czy jesteśmy w zasięgu)
+- dzisiejsze pomiary w tej strefie
+- dzisiejsze alerty w tej strefie
 
 ---
 
-## 🧱 Architektura projektu (MVVM)
+## 🚨 4. Logika alertów (Alert Engine)
 
-Projekt jest oparty o **MVVM**:
+### 4.1 Definicja alertu
+Pomiar jest oznaczony jako `ALERT`, gdy:
 
-### Warstwy
-✅ **UI (Compose)**  
-✅ **ViewModel (StateFlow)**  
-✅ **Repository**  
-✅ **Room DB**
+1. pomiar ma przypisaną strefę **(zoneId nie jest null)**  
+oraz
+2. **przekroczono próg w tej strefie**
 
-### Przepływ danych
-```
-Sensor / UI event
-   ↓
-MainViewModel
-   ↓
-Repository
-   ↓
-Room (DAO)
-   ↓
-Flow<List<...>>
-   ↓
-MainViewModel → UiState (StateFlow)
-   ↓
-Compose UI (collectAsState)
-```
+Czyli:
 
-### Zalety
-- UI automatycznie się odświeża
-- logika jest w ViewModel, nie w UI
-- baza i UI są rozdzielone
-- łatwiej utrzymać projekt
+- `soundDbApprox > maxNoiseDb`
+lub
+- `accelMagnitude > maxAccel`
+
+### 4.2 Gdzie alerty są używane
+Alerty są obliczane i wyświetlane w:
+
+- Dashboard: `alerty dzisiaj`
+- Historia: `status OK / ALERT` + filtr “Tylko alerty”
+- Strefy: `alerty dziś per strefa`
+
+### 4.3 Alert log – liczenie przekroczeń
+Dodatkowa wartość projektu: zliczanie liczby przekroczeń progu daje “przetwarzanie danych” i spełnia wymagania PAM mocniej.
 
 ---
 
-## 🗂️ Struktura projektu i pliki
+## 📊 5. Przetwarzanie danych (statystyki dnia)
 
-Przykładowa struktura katalogów:
+Statystyki dnia liczone są z pomiarów, których `timestampMs >= startOfTodayMs()`.
 
-```
-com.example.projectapki
-├── data
-│   ├── Measurement.kt
-│   ├── Zone.kt
-│   ├── MeasurementDao.kt
-│   ├── ZoneDao.kt
-│   └── AppDatabase.kt
-│
-├── repository
-│   └── MeasurementRepository.kt
-│
-├── sensors
-│   ├── LocationTracker.kt
-│   ├── MicLevelReader.kt
-│   └── AccelReader.kt
-│
-├── ui
-│   ├── components
-│   │   ├── StatusPill.kt
-│   │   ├── MiniChart.kt
-│   │   └── MetricRing.kt (opcjonalne bajery UI)
-│   │
-│   └── screens
-│       ├── DashboardScreen.kt
-│       ├── HistoryScreen.kt
-│       ├── ZonesScreen.kt
-│       └── DetailScreen.kt (opcjonalnie)
-│
-├── navigation
-│   ├── Route.kt
-│   └── AppRoot.kt / AppNavHost.kt
-│
-├── util
-│   └── ExportUtils.kt
-│
-└── viewmodel
-    └── MainViewModel.kt
-```
+Zestaw statystyk:
+
+- `avg` (średnia głośność)
+- `min` (najcichszy zapis)
+- `max` (najgłośniejszy zapis)
+- `count` (ile zapisów dzisiaj)
+
+Wykorzystanie `Calendar` zamiast `java.time` zapewnia wsparcie dla minSdk 24.
 
 ---
 
-## 💾 Baza danych Room
+## 🧠 6. Sposób pozyskiwania danych (sensors)
 
-### Encje
+### 6.1 Lokalizacja (GPS)
+- dane: `lat`, `lon`
+- źródło: Google Play Services Location
+- wymagane runtime permissions:
+  - `ACCESS_FINE_LOCATION`
+  - `ACCESS_COARSE_LOCATION`
+
+### 6.2 Mikrofon (soundDbApprox)
+- pomiar przybliżony “db-ish”
+- można to liczyć na różne sposoby:
+  - MediaRecorder (amplitude)
+  - AudioRecord + RMS
+
+W projekcie wykorzystana jest prosta metoda działająca w praktyce edukacyjnej, ale nie jest to profesjonalny decybelomierz.
+
+Wymagane permission:
+- `RECORD_AUDIO`
+
+### 6.3 Akcelerometr (|a|)
+- dane: `accelMagnitude = sqrt(ax^2 + ay^2 + az^2)`
+- to daje prostą miarę “jak mocno telefon jest poruszany”
+- można wykrywać np. potrząśnięcia
+
+### 6.4 Kamera (zdjęcie do pomiaru)
+- opcjonalne
+- wykonywane przez `TakePicture()` (ActivityResult API)
+- plik zdjęcia jest tworzony przez `FileProvider`
+
+Wymagane permission:
+- `CAMERA`
+
+---
+
+## 🗃️ 7. Trwałość danych (Room DB)
+
+### 7.1 Encje (Entities)
 
 #### `Measurement`
-Reprezentuje jeden pomiar:
-
+Przykładowe pola:
 - `id: Long`
 - `timestampMs: Long`
 - `lat: Double?`
@@ -298,344 +249,375 @@ Reprezentuje jeden pomiar:
 - `photoUri: String?`
 
 #### `Zone`
-Reprezentuje strefę użytkownika:
-
+Przykładowe pola:
 - `id: Long`
 - `name: String`
-- `lat: Double`
-- `lon: Double`
 - `radiusMeters: Double`
 - `maxNoiseDb: Double`
 - `maxAccel: Double`
+- `centerLat: Double`
+- `centerLon: Double`
 
 ---
 
-### DAO
+### 7.2 DAO
 
 #### `MeasurementDao`
-- insert pomiaru
-- obserwacja wszystkich pomiarów
-- obserwacja pomiarów dla strefy
-- kasowanie danych
+- `insert(m)`
+- `observeAll()`
+- `observeByZone(zoneId)`
+- `deleteAll()`
 
 #### `ZoneDao`
-- insert strefy
-- obserwacja wszystkich stref
-- (opcjonalnie) getById
+- `insert(z)`
+- `observeAll()`
+- `deleteAll()`
+- opcjonalnie: `getById(id)` jeśli potrzebujesz
 
 ---
 
-### Repository
-`MeasurementRepository` udostępnia funkcje wyższego poziomu:
-- insert pomiaru
-- pobieranie listy pomiarów jako Flow
-- insert strefy
-- pobieranie listy stref jako Flow
+### 7.3 Repository
+
+`MeasurementRepository` jest warstwą pośrednią między ViewModel a DAO, co:
+
+- poprawia testowalność
+- izoluje źródła danych
+- porządkuje architekturę
 
 ---
 
-## 🎨 UI/UX – opis ekranów
+## 🧱 8. Architektura (MVVM + StateFlow)
 
-Aplikacja posiada 3 główne ekrany:
+Projekt jest zrobiony w stylu MVVM:
 
-- **Dashboard**
-- **Historia**
-- **Strefy**
+- **UI** – Compose screens
+- **ViewModel** – logika, state, repo
+- **Repository** – dostęp do DB
+- **Room DB** – trwałość danych
+- **Sensors layer** – odczyt z sensorów
 
-Każdy ekran wykorzystuje:
-- karty (Card)
-- chipy (AssistChip)
-- czytelne sekcje
-- ikonki Material
-- przełączniki (Switch)
-- spójny styl
+### 8.1 Dlaczego MVVM
+MVVM pozwala na:
+- łatwe odświeżanie UI (bez “ręcznego” setState)
+- trzymanie danych w jednym miejscu
+- rozdzielenie logiki od widoków
 
----
+### 8.2 StateFlow
+`UiState` jest wystawiony jako `StateFlow`:
 
-### 🟣 Dashboard
-
-Dashboard pokazuje:
-- live sensory
-- status w strefie
-- statystyki dnia
-- najgłośniejszy pomiar dnia
-- wykres hałasu
-- akcje: zapis, foto+zapis, eksport
-
-**Elementy UX:**
-- “Najgłośniejszy pomiar dnia”
-- “Statystyki dnia”
-- “Alert log”
+- UI subskrybuje: `collectAsState()`
+- gdy ViewModel zmienia dane → UI update automatycznie
 
 ---
 
-### 🟣 Historia
+## 🧭 9. Nawigacja
 
-Historia zawiera:
-- listę pomiarów w kartach
-- status OK/ALERT
-- zdjęcie jeśli istnieje
-- możliwość filtrowania alertów
+Projekt wykorzystuje `Navigation Compose`.
 
-**UX feature: filtr “Tylko alerty 🚨”**
-- OFF: wszystko
-- ON: tylko przekroczenia progów stref
-
----
-
-### 🟣 Strefy
-
-Strefy pozwalają:
-- dodać strefę na podstawie GPS
-- nadać nazwę i progi
-- sprawdzić ile alertów było dzisiaj w strefie
-
-**UX feature: “alerty dziś” per strefa**
-- ilość pomiarów dzisiaj
-- ilość alertów dzisiaj
-
----
-
-## 🧭 Nawigacja
-
-Aplikacja wykorzystuje **Navigation Compose** oraz bottom bar.
-
-Zakładki:
+Istnieją 3 główne ekrany:
 - Dashboard
 - Historia
 - Strefy
 
-Opcjonalnie:
-- Szczegóły pomiaru (DetailScreen)
+Dodatkowo (opcjonalnie):
+- DetailScreen (szczegóły pomiaru)
+
+Możliwe dwa podejścia:
+
+### 9.1 BottomBar (AppRoot)
+- nowoczesny styl
+- stały dostęp do ekranów
+- wygląda jak “appka produktowa”
+
+### 9.2 Prosty NavHost (AppNavHost)
+- minimalistycznie
+- mniej kodu
+- łatwe do oceniania
 
 ---
 
-## 🔐 Uprawnienia i zgodność sprzętowa
+## 🔐 10. Uprawnienia i manifest
+
+W `AndroidManifest.xml`:
 
 ### Permissions
-W aplikacji wykorzystywane są:
+```xml
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.CAMERA" />
+```
 
-- `ACCESS_FINE_LOCATION`
-- `ACCESS_COARSE_LOCATION`
-- `RECORD_AUDIO`
-- `CAMERA`
-
-Uprawnienia runtime są pobierane przy pierwszym wejściu na Dashboard.
-
----
-
-### Manifest – uses-feature
-Aby aplikacja mogła instalować się na większej liczbie urządzeń:
-
+### Features (opcjonalne)
+Aby nie blokować instalacji na urządzeniach bez kamery/mikrofonu/GPS:
 ```xml
 <uses-feature android:name="android.hardware.microphone" android:required="false"/>
 <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
 <uses-feature android:name="android.hardware.camera" android:required="false"/>
 ```
 
-To rozwiązuje warning:
-> Permission exists without corresponding hardware `<uses-feature ...>` tag
+To usuwa warning:
+> Permission exists without corresponding hardware `<uses-feature ...>`
 
 ---
 
-## 📷 Zdjęcia i FileProvider
+## 📦 11. Build, APK, release
 
-Zdjęcia realizowane są przez:
-- `TakePicture()` (Activity Result API)
-- URI stworzone przez `ExportUtils.createPhotoUri(context)`
-- `FileProvider` w manifest
-
-### Flow
-1. `Foto + zapis`
-2. tworzony URI
-3. aparat robi zdjęcie
-4. po sukcesie: zapis pomiaru z `photoUri`
-
----
-
-## 📤 Eksport CSV
-
-Eksport działa jako:
-- zapis CSV do pliku
-- udostępnienie przez `Intent.ACTION_SEND`
-
-Na Dashboardzie eksportuje całość, a w Historii eksportuje dane po filtrach.
-
----
-
-## 🧪 Testowanie aplikacji (scenariusze)
-
-### Scenariusz 1 – zapis podstawowy
-1. Uruchom aplikację
-2. Przyznaj uprawnienia
-3. Kliknij `Zapisz pomiar`
-✅ rekord pojawia się w Historii
-
----
-
-### Scenariusz 2 – zdjęcie + zapis
-1. Kliknij `Foto + zapis`
-2. Zrób zdjęcie
-✅ rekord w Historii ma miniaturę
-
----
-
-### Scenariusz 3 – alert w strefie
-1. Dodaj strefę z niskimi limitami
-2. Zapisz pomiar w strefie
-✅ w Historii pojawia się ALERT
-
----
-
-### Scenariusz 4 – filtr alertów
-1. Wejdź w Historia
-2. Włącz “Tylko alerty 🚨”
-✅ lista pokazuje tylko alerty
-
----
-
-### Scenariusz 5 – alerty dziś w strefach
-1. Dodaj strefę
-2. Zrób kilka pomiarów
-✅ rosną liczniki “dzisiaj” i “alerty dziś”
-
----
-
-## 🏗️ Build APK i uruchomienie
-
-### Debug APK
+### 11.1 Debug APK
 ```powershell
 .\gradlew assembleDebug
 ```
 
-APK:
+Plik:
 ```
-app\build\outputs\apk\debug\app-debug.apk
+app/build/outputs/apk/debug/app-debug.apk
 ```
 
----
-
-### Release APK (unsigned)
+### 11.2 Release APK (unsigned)
 ```powershell
 .\gradlew assembleRelease
 ```
 
-APK:
+U Ciebie generuje:
 ```
-app\build\outputs\apk\release\app-release-unsigned.apk
+app/build/outputs/apk/release/app-release-unsigned.apk
 ```
 
----
-
-### Kopia z ładną nazwą
+### 11.3 Zmiana nazwy pliku APK (PowerShell)
 ```powershell
-Copy-Item .\app\build\outputs\apk\release\app-release-unsigned.apk .\SensorLogger_v1.0_release.apk
+Copy-Item .\app\build\outputs\apk\release\app-release-unsigned.apk .\SensorLogger_v1.0_release_unsigned.apk
 ```
 
----
+### 11.4 Dlaczego “App not installed”
+Jeżeli instalacja release nie działa i jest “App not installed”, najczęstsze powody:
 
-## ⚠️ Typowe problemy i rozwiązania
-
-### 1) KSP “too old for kotlin…”
-Jeśli pojawia się warning:
-`ksp-2.0.20-1.0.24 is too old for kotlin-2.0.21`
-
-To jest tylko ostrzeżenie, build może przechodzić.
-Opcje rozwiązania:
-- upgrade KSP do wersji zgodnej z Kotlin
-- lub downgrade Kotlin do 2.0.20
-
----
-
-### 2) `clean` nie usuwa build folderu
-Windows lub Android Studio może blokować pliki.
-
-Rozwiązania:
-- zamknij Android Studio
-- zamknij emulator
-- usuń `app/build` ręcznie
-- uruchom ponownie build
-
----
-
-### 3) “App not installed” na telefonie
-Najczęściej:
-- próbujesz instalować release unsigned
-- albo masz starą wersję z innym podpisem
+- APK jest **unsigned** (a telefon czasem blokuje)
+- konflikt wersji / podpisu (np. debug był z innym podpisem)
+- ta sama paczka `applicationId` już jest na telefonie, ale z innym podpisem
 
 Rozwiązanie:
-- odinstaluj starą apkę z telefonu
-- zainstaluj debug build przez Android Studio
-- albo zrób signed release (keystore)
+1) usuń appkę z telefonu  
+2) zainstaluj nową wersję  
+lub
+3) skonfiguruj podpisywanie release (keystore)
 
 ---
 
-### 4) Na telefonie brak ikonki aparatu
-Najczęstsze przyczyny:
-- kamera permission nie nadana
-- inny build niż ten co myślisz (stara apkka)
-- telefon nie ma kamery / feature off
+## 🔑 12. Podpisywanie Release (keystore)
 
-Sprawdź:
-- Ustawienia → Aplikacje → SensorLogger → Uprawnienia → Kamera
-- i czy przycisk `Foto + zapis` ma enabled
+### 12.1 Tworzenie keystore (Windows)
+```powershell
+keytool -genkeypair -v `
+  -keystore sensorlogger-release.keystore `
+  -alias sensorlogger `
+  -keyalg RSA -keysize 2048 -validity 10000
+```
 
----
+### 12.2 Konfiguracja w `app/build.gradle.kts` (przykład)
+> To jest przykład, nie kopiuj haseł do repo.
 
-## 🚀 Rozwój projektu (pomysły na wersję 2.0)
+```kotlin
+android {
+  signingConfigs {
+    create("release") {
+      storeFile = file("../sensorlogger-release.keystore")
+      storePassword = "HASLO"
+      keyAlias = "sensorlogger"
+      keyPassword = "HASLO"
+    }
+  }
 
-Możliwe ulepszenia:
-- automatyczny zapis co X sekund
-- wykres ruchu i wykres dzienny
-- mapa stref
-- eksport do JSON
-- powiadomienia o alertach
-- wykrywanie “najczęstszej strefy” dnia
+  buildTypes {
+    release {
+      signingConfig = signingConfigs.getByName("release")
+      isMinifyEnabled = false
+    }
+  }
+}
+```
 
----
-
-## ✅ Podsumowanie zgodności z wymaganiami PAM
-
-Projekt spełnia wymagania:
-
-✅ Minimum 3 źródła danych:
-- GPS
-- mikrofon
-- akcelerometr
-
-✅ Zapis danych:
-- Room DB
-
-✅ Przetwarzanie:
-- alerty
-- statystyki dnia
-- filtr alertów
-- najgłośniejszy pomiar dnia
-
-✅ Prezentacja:
-- Dashboard + wykres + chipy + karty
-- Historia + filtr
-- Strefy + alerty dziś
-
-✅ UX:
-- 3 bajery premium UI/UX
+Po tym powinien wygenerować:
+```
+app-release.apk
+```
 
 ---
 
-## 📷 Screenshots
+## 🧪 13. Testowanie aplikacji (emulator + telefon)
 
-W README można dodawać screeny (tak, to normalne i mile widziane).
+### 13.1 Emulator (AVD)
+W emulatorze możesz testować:
+- UI
+- zapisy do bazy
+- historię
+- eksport CSV
 
-Proponowane screeny:
-- Dashboard (live + statystyki dnia)
-- Najgłośniejszy pomiar dnia (z miniaturą)
-- Historia + filtr alertów
-- Strefy + alerty dziś
-- Pomiar z dołączonym zdjęciem
+Uwaga:
+- GPS trzeba włączyć w AVD (Extended Controls → Location)
+- mikrofon bywa ograniczony (zależy od systemu)
 
-Przykład:
+### 13.2 Telefon
+Na telefonie działa najlepiej:
+- kamera
+- mikrofon (realny)
+- GPS (realny)
+
+---
+
+## ✅ 14. Scenariusze testowe (manual QA)
+
+### SC-01: Uruchomienie i permissions
+1. Uruchom aplikację
+2. Przyznaj uprawnienia
+3. Sprawdź czy LIVE dane się pojawiają
+
+✅ Oczekiwane: brak crasha, dane są widoczne
+
+---
+
+### SC-02: Zapis pomiaru
+1. Dashboard → “Zapisz pomiar”
+2. Przejdź do historii
+
+✅ rekord pojawia się na liście
+
+---
+
+### SC-03: Foto + zapis
+1. Dashboard → “Foto + zapis”
+2. Zrób zdjęcie
+3. Wejdź w historię
+
+✅ rekord ma miniaturę zdjęcia
+
+---
+
+### SC-04: Dodaj strefę
+1. Wejdź w Strefy
+2. Podaj nazwę i progi
+3. Dodaj
+
+✅ strefa jest na liście
+
+---
+
+### SC-05: Alerty
+1. Ustaw niskie progi (np. maxNoise = 1)
+2. Zapisz pomiar
+
+✅ rekord jest oznaczony jako ALERT
+
+---
+
+### SC-06: Filtr alertów
+1. Historia → przełącz “Tylko alerty”
+2. Porównaj widok
+
+✅ pokazują się tylko przekroczenia
+
+---
+
+### SC-07: Eksport CSV
+1. Historia → eksport CSV
+2. Udostępnij
+
+✅ plik jest poprawnie generowany
+
+---
+
+## 🎨 15. UI/UX i styl “projektowy”
+
+W projekcie zrobiono:
+- karty z rounded corners (22dp)
+- chipy statusowe
+- ikonki
+- sekcje “premium”
+- wyraźną hierarchię informacji
+
+Dla wersji “pudrowo różowej” można dodać custom theme:
+
+- pastelowy primary
+- jaśniejszy surface
+- subtelne gradienty
+
+---
+
+## ⚠️ 16. Znane ograniczenia
+
+- pomiar “db-ish” nie jest certyfikowanym pomiarem dB
+- GPS może być niedokładny w budynkach
+- alerty zależą od strefy (jeśli brak strefy → brak alertu)
+
+---
+
+## 🚀 17. Rozwój (co można dodać)
+
+Pomysły na dalsze rozbudowy:
+- wykres ruchu (|a|)
+- wykres alertów per godzina
+- notatki do pomiarów
+- sortowanie historii
+- eksport JSON
+- widget na pulpit
+
+---
+
+## 📁 18. Struktura katalogów (przykładowa)
+
+```
+app/src/main/java/com/example/projectapki/
+├── data/
+│   ├── Measurement.kt
+│   ├── Zone.kt
+│   ├── MeasurementDao.kt
+│   ├── ZoneDao.kt
+│   └── AppDatabase.kt
+├── repository/
+│   └── MeasurementRepository.kt
+├── sensors/
+│   ├── LocationReader.kt
+│   ├── MicLevelReader.kt
+│   └── AccelReader.kt
+├── ui/
+│   ├── components/
+│   │   ├── MiniChart.kt
+│   │   ├── StatusPill.kt
+│   │   └── MetricRing.kt
+│   └── screens/
+│       ├── DashboardScreen.kt
+│       ├── HistoryScreen.kt
+│       ├── ZonesScreen.kt
+│       └── DetailScreen.kt (opcjonalnie)
+├── navigation/
+│   ├── Route.kt
+│   └── AppRoot.kt / AppNavHost.kt
+└── viewmodel/
+    └── MainViewModel.kt
+```
+
+---
+
+## 🧾 19. Informacje końcowe
+
+Projekt spełnia założenia PAM poprzez:
+- realne sensory
+- zapis w DB
+- przetwarzanie + alerty
+- intuicyjne UI/UX
+- eksport danych
+
+---
+
+## 📸 20. Screeny w README
+Tak, jak najbardziej możesz wrzucać screeny do README.  
+Najlepiej w folderze `/screens/` i referencje:
+
 ```md
 ![Dashboard](screens/dashboard.png)
-![History](screens/history.png)
-![Zones](screens/zones.png)
 ```
+
+---
+
+## 🧡 Autor
+Projekt wykonany w ramach PAM przez: **Justyna Starszak**  
+Rok akademicki: 2025/2026

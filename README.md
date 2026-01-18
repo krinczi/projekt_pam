@@ -546,7 +546,7 @@ Druga część ekranu głównego dashboardu z dodatkowymi sekcjami/kafelkami.
 
 ### 3) Dashboard z zapisami
 Widok dashboardu zawierający zapisane dane/pomiary oraz ich podsumowanie.
-![Dashboard z zapisami](screenshoty/dashboardzapisami.png)
+![Dashboard z zapisami](screenshoty/dashboardzzapisami.png)
 
 ---
 

@@ -600,7 +600,7 @@ Ekran udostępniania pliku CSV (eksport danych).
 ---
 
 ### 11) Strefa nieaktywna
-Widok strefy w stanie wyłączonym / brak działania (stan UI).
+Widok strefy w stanie wyłączonym - nie jesteśmy w jej zakresie.
 
 ![Strefa nieaktywna](screenshoty/strefanieaktytwna.png)
 
@@ -621,14 +621,14 @@ Widok szczegółowy jednego wpisu z historii (pełne dane).
 ---
 
 ### 14) Usunięte pomiary
-Ekran pokazujący stan po usunięciu pomiarów lub potwierdzenie operacji.
+Ekran pokazujący stan po usunięciu pomiarów lub po prostu pusty.
 
 ![Usunięte pomiary](screenshoty/usunietepomiary.png)
 
 ---
 
 ### 15) Zdjęcie do szczegółów
-Podgląd grafiki/zdjęcia używanej w ekranie szczegółów (element wizualny).
+Podgląd grafiki/zdjęcia używanej w ekranie szczegółów do zapisu dowodu w postaci fotki.
 
 ![Zdjęcie do szczegółów](screenshoty/zdjeciedoszczegolow.png)
 

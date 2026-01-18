@@ -38,7 +38,7 @@ Aplikacja:
 - ✅ wykonuje **przetwarzanie danych (statystyki, alerty)**
 - ✅ prezentuje dane w intuicyjnym UI
 - ✅ pozwala na interakcję użytkownika (strefy, zapis, filtr, eksport)
-- ✅ działa offline (wszystko lokalnie)
+- ✅ działa offline 
 
 ### ✅ Wykorzystane źródła danych
 Projekt wykorzystuje więcej niż wymagane minimum:

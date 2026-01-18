@@ -527,97 +527,109 @@ Projekt spełnia założenia PAM poprzez:
 - eksport danych
 
 ---
-
-## 📸 20. Screeny w README
-
-## 📸 Screenshots
+## 📸 20. Screenshots
 
 ### 1) Historia alertów
 Lista zapisanych alertów/zdarzeń wygenerowanych przez aplikację.
+
 ![Historia alertów](screenshoty/alertyhistoria.png)
 
 ---
 
 ### 2) Dashboard (druga część)
 Druga część ekranu głównego dashboardu z dodatkowymi sekcjami/kafelkami.
+
 ![Dashboard druga część](screenshoty/dashboarddrugaczesc.png)
 
 ---
 
 ### 3) Dashboard z zapisami
 Widok dashboardu zawierający zapisane dane/pomiary oraz ich podsumowanie.
+
 ![Dashboard z zapisami](screenshoty/dashboardzzapisami.png)
 
 ---
 
 ### 4) Dodawanie strefy
 Formularz tworzenia nowej strefy (np. nazwa + parametry).
+
 ![Dodawanie strefy](screenshoty/dodawaniestrefy.png)
 
 ---
 
 ### 5) Historia (główna)
 Główna lista historii pomiarów/zdarzeń w aplikacji.
+
 ![Historia](screenshoty/historia.png)
 
 ---
 
 ### 6) Dashboard (główny ekran)
 Startowy widok dashboardu z podstawowymi informacjami i nawigacją.
+
 ![Dashboard](screenshoty/screendashboardu.png)
 
 ---
 
 ### 7) Uprawnienia: aparat
 Systemowe okno proszące o dostęp do aparatu.
+
 ![Uprawnienia aparatu](screenshoty/screenuprawnienaparatu.png)
 
 ---
 
 ### 8) Uprawnienia: GPS / lokalizacja
 Systemowe okno proszące o dostęp do lokalizacji urządzenia.
+
 ![Uprawnienia GPS](screenshoty/screenuprawniengps.png)
 
 ---
 
 ### 9) Uprawnienia: mikrofon
 Systemowe okno proszące o dostęp do mikrofonu.
+
 ![Uprawnienia mikrofonu](screenshoty/screenuprawnienmikrofonu.png)
 
 ---
 
 ### 10) Udostępnianie CSV
 Ekran udostępniania pliku CSV (np. eksport danych).
+
 ![Udostępnianie CSV](screenshoty/sharecsv.png)
 
 ---
 
 ### 11) Strefa nieaktywna
 Widok strefy w stanie wyłączonym / brak działania (stan UI).
+
 ![Strefa nieaktywna](screenshoty/strefanieaktywna.png)
 
 ---
 
 ### 12) Lista stref
 Lista wszystkich dostępnych stref wraz z możliwością zarządzania nimi.
+
 ![Lista stref](screenshoty/strefy.png)
 
 ---
 
 ### 13) Szczegóły historii
 Widok szczegółowy jednego wpisu z historii (pełne dane).
+
 ![Szczegóły historii](screenshoty/szczegolyhistorii.png)
 
 ---
 
 ### 14) Usunięte pomiary
 Ekran pokazujący stan po usunięciu pomiarów lub potwierdzenie operacji.
+
 ![Usunięte pomiary](screenshoty/usunietepomiary.png)
 
 ---
 
 ### 15) Zdjęcie do szczegółów
 Podgląd grafiki/zdjęcia używanej w ekranie szczegółów (element wizualny).
+
 ![Zdjęcie do szczegółów](screenshoty/zdjeciedoszczegolow.png)
 
 ---

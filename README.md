@@ -18,7 +18,7 @@ Użytkownik może:
 - przeglądać historię oraz filtrować tylko alerty,
 - eksportować historię pomiarów do pliku **CSV** i udostępnić go dalej.
 
-Projekt jest zaprojektowany tak, aby wyglądał jak **prawdziwa aplikacja projektowa**, a nie jak “labka”, dlatego UI zawiera:
+Projekt jest zaprojektowany tak, aby wyglądał jak **prawdziwa aplikacja projektowa** dlatego UI zawiera:
 - spójne karty,
 - chipy statusowe,
 - czytelny dashboard,

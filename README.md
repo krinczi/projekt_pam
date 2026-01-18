@@ -311,7 +311,7 @@ Istnieją 3 główne ekrany:
 - Historia
 - Strefy
 
-Dodatkowo (opcjonalnie):
+Dodatkowo:
 - DetailScreen (szczegóły pomiaru)
 
 Możliwe dwa podejścia:
@@ -319,7 +319,6 @@ Możliwe dwa podejścia:
 ### 9.1 BottomBar (AppRoot)
 - nowoczesny styl
 - stały dostęp do ekranów
-- wygląda jak “appka produktowa”
 
 ### 9.2 Prosty NavHost (AppNavHost)
 - minimalistycznie
@@ -340,7 +339,7 @@ W `AndroidManifest.xml`:
 <uses-permission android:name="android.permission.CAMERA" />
 ```
 
-### Features (opcjonalne)
+### Features
 Aby nie blokować instalacji na urządzeniach bez kamery/mikrofonu/GPS:
 ```xml
 <uses-feature android:name="android.hardware.microphone" android:required="false"/>
@@ -365,75 +364,10 @@ Plik:
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
-### 11.2 Release APK (unsigned)
+### 11.2 Release APK 
 ```powershell
 .\gradlew assembleRelease
 ```
-
-U Ciebie generuje:
-```
-app/build/outputs/apk/release/app-release-unsigned.apk
-```
-
-### 11.3 Zmiana nazwy pliku APK (PowerShell)
-```powershell
-Copy-Item .\app\build\outputs\apk\release\app-release-unsigned.apk .\SensorLogger_v1.0_release_unsigned.apk
-```
-
-### 11.4 Dlaczego “App not installed”
-Jeżeli instalacja release nie działa i jest “App not installed”, najczęstsze powody:
-
-- APK jest **unsigned** (a telefon czasem blokuje)
-- konflikt wersji / podpisu (np. debug był z innym podpisem)
-- ta sama paczka `applicationId` już jest na telefonie, ale z innym podpisem
-
-Rozwiązanie:
-1) usuń appkę z telefonu  
-2) zainstaluj nową wersję  
-lub
-3) skonfiguruj podpisywanie release (keystore)
-
----
-
-## 🔑 12. Podpisywanie Release (keystore)
-
-### 12.1 Tworzenie keystore (Windows)
-```powershell
-keytool -genkeypair -v `
-  -keystore sensorlogger-release.keystore `
-  -alias sensorlogger `
-  -keyalg RSA -keysize 2048 -validity 10000
-```
-
-### 12.2 Konfiguracja w `app/build.gradle.kts` (przykład)
-> To jest przykład, nie kopiuj haseł do repo.
-
-```kotlin
-android {
-  signingConfigs {
-    create("release") {
-      storeFile = file("../sensorlogger-release.keystore")
-      storePassword = "HASLO"
-      keyAlias = "sensorlogger"
-      keyPassword = "HASLO"
-    }
-  }
-
-  buildTypes {
-    release {
-      signingConfig = signingConfigs.getByName("release")
-      isMinifyEnabled = false
-    }
-  }
-}
-```
-
-Po tym powinien wygenerować:
-```
-app-release.apk
-```
-
----
 
 ## 🧪 13. Testowanie aplikacji (emulator + telefon)
 
@@ -526,12 +460,6 @@ W projekcie zrobiono:
 - sekcje “premium”
 - wyraźną hierarchię informacji
 
-Dla wersji “pudrowo różowej” można dodać custom theme:
-
-- pastelowy primary
-- jaśniejszy surface
-- subtelne gradienty
-
 ---
 
 ## ⚠️ 16. Znane ograniczenia
@@ -542,7 +470,7 @@ Dla wersji “pudrowo różowej” można dodać custom theme:
 
 ---
 
-## 🚀 17. Rozwój (co można dodać)
+## 🚀 17. Rozwój 
 
 Pomysły na dalsze rozbudowy:
 - wykres ruchu (|a|)
@@ -554,7 +482,7 @@ Pomysły na dalsze rozbudowy:
 
 ---
 
-## 📁 18. Struktura katalogów (przykładowa)
+## 📁 18. Struktura katalogów
 
 ```
 app/src/main/java/com/example/projectapki/
@@ -601,12 +529,7 @@ Projekt spełnia założenia PAM poprzez:
 ---
 
 ## 📸 20. Screeny w README
-Tak, jak najbardziej możesz wrzucać screeny do README.  
-Najlepiej w folderze `/screens/` i referencje:
 
-```md
-![Dashboard](screens/dashboard.png)
-```
 
 ---
 

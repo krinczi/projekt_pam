@@ -530,35 +530,35 @@ Projekt spełnia założenia PAM poprzez:
 ## 📸 20. Screenshots
 
 ### 1) Historia alertów
-Lista zapisanych alertów/zdarzeń wygenerowanych przez aplikację.
+Lista zapisanych alertów/zdarzeń wygenerowanych przez aplikację ale po kliknięciu usuń.
 
 ![Historia alertów](screenshoty/alertyhistoria.png)
 
 ---
 
-### 2) Dashboard (druga część)
-Druga część ekranu głównego dashboardu z dodatkowymi sekcjami/kafelkami.
-
-![Dashboard druga część](screenshoty/dashboarddrugaczesc.png)
-
----
-
-### 3) Dashboard z zapisami
-Widok dashboardu zawierający zapisane dane/pomiary oraz ich podsumowanie.
+### 2) Dashboard z zapisami (piersza część)
+Widok dashboardu zawierający zapisane dane/pomiary oraz ich podsumowanie, live pomiar etc.
 
 ![Dashboard z zapisami](screenshoty/dashboardzzapisami.png)
 
 ---
 
+### 3) Dashboard (druga część)
+Druga część ekranu głównego dashboardu z dodatkowymi sekcjami/kafelkami - statystyki dnia, alerty, najgłośniejszy pomiar dnia, wykres hałasu  (ostatnie 20).
+
+![Dashboard druga część](screenshoty/dashboarddrugaczesc.png)
+
+---
+
 ### 4) Dodawanie strefy
-Formularz tworzenia nowej strefy (np. nazwa + parametry).
+Formularz tworzenia nowej strefy (np. nazwa + parametry), promień, max hałas, max ruch i lista stref.
 
 ![Dodawanie strefy](screenshoty/dodawaniestrefy.png)
 
 ---
 
 ### 5) Historia (główna)
-Główna lista historii pomiarów/zdarzeń w aplikacji.
+Główna lista historii pomiarów/zdarzeń w aplikacji, filtry, rekordy.
 
 ![Historia](screenshoty/historia.png)
 
@@ -593,7 +593,7 @@ Systemowe okno proszące o dostęp do mikrofonu.
 ---
 
 ### 10) Udostępnianie CSV
-Ekran udostępniania pliku CSV (np. eksport danych).
+Ekran udostępniania pliku CSV (eksport danych).
 
 ![Udostępnianie CSV](screenshoty/sharecsv.png)
 
@@ -602,7 +602,7 @@ Ekran udostępniania pliku CSV (np. eksport danych).
 ### 11) Strefa nieaktywna
 Widok strefy w stanie wyłączonym / brak działania (stan UI).
 
-![Strefa nieaktywna](screenshoty/strefanieaktywna.png)
+![Strefa nieaktywna](screenshoty/strefanieaktytwna.png)
 
 ---
 

@@ -534,7 +534,7 @@ Projekt spełnia założenia PAM poprzez:
 
 ### 1) Historia alertów
 Lista zapisanych alertów/zdarzeń wygenerowanych przez aplikację.
-![Historia alertów](screenshoty/alerthistoria.png)
+![Historia alertów](screenshoty/alertyhistoria.png)
 
 ---
 

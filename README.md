@@ -1,7 +1,19 @@
 # 📱 Sensor Logger (Projekt PAM)
 
-Aplikacja mobilna na Androida wykonana w ramach projektu z przedmiotu **Programowanie urządzeń mobilnych (PAM)**.  
-Projekt wykorzystuje sensory telefonu, zapisuje dane w bazie oraz prezentuje je w formie dashboardu, historii i stref z alertami.
+Sensor Logger to aplikacja mobilna na Androida, która zbiera dane z sensorów telefonu (GPS, mikrofon, akcelerometr) oraz opcjonalnie wykonuje zdjęcie podczas zapisu pomiaru. Dane są zapisywane lokalnie w bazie Room i prezentowane w formie Dashboardu, Historii oraz Stref z alertami.
+
+Projekt został wykonany w ramach przedmiotu **Programowanie urządzeń mobilnych (PAM)**.
+
+---
+
+## 🧾 Informacje ogólne
+
+**Nazwa aplikacji:** Sensor Logger  
+**Platforma:** Android  
+**Język:** Kotlin  
+**UI:** Jetpack Compose (Material 3)  
+**Architektura:** MVVM + Repository + Room  
+**Tryb działania:** offline (brak serwera)
 
 ---
 
@@ -9,152 +21,184 @@ Projekt wykorzystuje sensory telefonu, zapisuje dane w bazie oraz prezentuje je 
 
 Celem projektu było stworzenie aplikacji, która:
 
-- korzysta z **minimum 3 źródeł danych / sensorów** telefonu,
-- zbiera i zapisuje pomiary,
-- wykonuje **przetwarzanie danych (statystyki, alerty)**,
-- prezentuje dane w atrakcyjnej i intuicyjnej formie (UI/UX).
+- wykorzystuje **minimum 3 źródła danych / sensorów** telefonu,
+- umożliwia **rejestrowanie pomiarów** (manualnie),
+- zapewnia **trwały zapis** danych (baza lokalna),
+- wykonuje **przetwarzanie danych** (alerty, statystyki),
+- prezentuje dane w formie intuicyjnego UI (Dashboard / Historia / Strefy),
+- oferuje minimum 1 element “miłego UX”.
 
 ---
 
 ## ✅ Funkcje aplikacji
 
-### 🟣 Dashboard
-Ekran główny aplikacji – szybki podgląd live + statystyki:
+### 🟣 1) Dashboard (Ekran główny)
+Ekran Dashboard pełni rolę centrum sterowania i podsumowania stanu aplikacji.
 
-- **Live sensory**
+**Zawiera:**
+- Live sensory:
   - GPS (lat/lon)
-  - Mikrofon (db-ish)
-  - Akcelerometr (|a|)
-- **Statystyki dnia**
+  - mikrofon (poziom hałasu w formie „db-ish”)
+  - akcelerometr (|a| – intensywność ruchu)
+- Statystyki dnia:
   - liczba zapisów dzisiaj
   - liczba alertów dzisiaj
   - min / max / avg hałasu
-- **Najgłośniejszy pomiar dnia (UX feature)**
-  - godzina pomiaru
+- “UX feature”: **Najgłośniejszy pomiar dnia**
+  - godzina
   - wartość dB
-  - nazwa strefy
-  - miniatura zdjęcia (jeśli było)
-- **Wykres hałasu** (ostatnie 20 zapisów)
-- Akcje:
+  - strefa
+  - miniatura zdjęcia (jeśli zapisano)
+- Wykres hałasu (ostatnie 20 zapisów)
+- Akcje użytkownika:
   - `Zapisz pomiar`
   - `Foto + zapis`
   - `Eksport CSV`
 
 ---
 
-### 🟣 Historia pomiarów
-Lista wszystkich zapisanych pomiarów:
+### 🟣 2) Historia pomiarów
+Ekran Historii prezentuje listę wszystkich zapisanych pomiarów w formie kart.
 
-- data i godzina
-- GPS
-- głośność (db-ish)
+**Każdy rekord zawiera:**
+- datę i godzinę zapisu
+- GPS (lat/lon)
+- hałas (db-ish)
 - ruch (|a|)
 - status `OK ✅` / `ALERT 🚨`
-- miniatura zdjęcia (jeśli dodane)
+- miniaturę zdjęcia (jeśli istnieje)
 
-**Premium UX: filtr “Tylko alerty 🚨”**
+**Dodatkowy UX (filtr alertów):**
 - OFF → pokazuje wszystkie pomiary
-- ON → pokazuje tylko te, które przekroczyły próg strefy
+- ON → pokazuje tylko rekordy, które były alertem (przekroczenie progu w strefie)
 
-Dodatkowo:
-- eksport CSV dla aktualnie widocznych danych
+**Dodatkowo:**
+- eksport CSV widocznych rekordów
 
 ---
 
-### 🟣 Strefy
-Dodawanie stref z aktualnej lokalizacji GPS:
+### 🟣 3) Strefy
+Ekran Stref umożliwia utworzenie lokalizacji z progami komfortu.
 
+**Użytkownik definiuje strefę:**
 - nazwa (np. Dom / Praca / Uczelnia)
 - promień (m)
 - limit hałasu (dB)
 - limit ruchu (|a|)
 
-Lista stref zawiera:
-
-- aktywna strefa (jeśli użytkownik jest w zasięgu)
+**Lista stref pokazuje:**
+- aktywność (czy użytkownik jest aktualnie w strefie)
 - progi strefy
-- **dzisiejsze pomiary w strefie**
-- **dzisiejsze alerty w strefie** ✅
+- liczba pomiarów **dzisiaj** w strefie
+- liczba alertów **dzisiaj** w strefie ✅
 
 ---
 
 ## 🚨 Logika alertów
 
-Pomiar jest oznaczony jako **ALERT**, gdy:
+Pomiar jest oznaczony jako **ALERT**, jeśli:
 
-- pomiar ma przypisaną strefę **i**
+1) ma przypisaną strefę (`zoneId != null`)  
+**i**
+2) przekracza próg strefy:
+
 - `soundDbApprox > maxNoiseDb`  
   **lub**
 - `accelMagnitude > maxAccel`
 
 Alerty są liczone w:
-
-- **Historii** (status OK / ALERT)
-- **Dashboardzie** (ilość alertów dzisiaj)
-- **Strefach** (alerty dziś per strefa)
-
----
-
-## 🧠 Akwizycja danych (sensory / źródła danych)
-
-Aplikacja wykorzystuje więcej niż wymagane 3 źródła:
-
-- ✅ **GPS / lokalizacja** – lat/lon
-- ✅ **Mikrofon** – poziom głośności (db-ish)
-- ✅ **Akcelerometr** – |a| (ruch)
-- ✅ **Kamera** – opcjonalne zdjęcie do pomiaru
-- ✅ **Pamięć urządzenia** – Room DB + eksport CSV
+- Historii (status rekordu)
+- Dashboardzie (alerty dzisiaj)
+- Strefach (alerty dzisiaj per strefa)
 
 ---
 
-## 💾 Trwałość danych (Room)
+## 🧠 Źródła danych (sensory i funkcje urządzenia)
 
-Dane są przechowywane w bazie lokalnej Room:
+Aplikacja wykorzystuje następujące zasoby:
 
-- `Measurement` (pomiary)
-- `Zone` (strefy)
+- ✅ **GPS / lokalizacja** (lat/lon)
+- ✅ **Mikrofon** (wartość orientacyjna hałasu)
+- ✅ **Akcelerometr** (moduł przyspieszenia |a|)
+- ✅ **Kamera** (opcjonalne zdjęcie do pomiaru)
+- ✅ **Pamięć urządzenia** (Room DB + eksport CSV)
 
-DAO:
+---
+
+## 💾 Trwałość danych (Room Database)
+
+Dane są przechowywane w lokalnej bazie **Room**.
+
+### Encje:
+- `Measurement` – pomiar sensora
+- `Zone` – strefa użytkownika
+
+### DAO:
 - `MeasurementDao`
 - `ZoneDao`
 
-Repozytorium:
+### Repository:
 - `MeasurementRepository`
 
 ---
 
-## 🧱 Architektura projektu (MVVM)
+## 🧱 Architektura aplikacji (MVVM)
 
-Projekt jest zorganizowany warstwowo:
+Aplikacja została zbudowana w oparciu o MVVM.
 
-- **UI (Jetpack Compose)**
-  - `DashboardScreen`
-  - `HistoryScreen`
-  - `ZonesScreen`
-  - (opcjonalnie) `DetailScreen`
-- **ViewModel**
-  - `MainViewModel`
-- **State**
-  - `UiState` trzymany w `StateFlow`
-- **Repository**
-  - logika zapisu/odczytu
-- **Room**
-  - trwała baza danych
+### Warstwy:
+1. **UI (Compose)**
+   - DashboardScreen
+   - HistoryScreen
+   - ZonesScreen
+   - (opcjonalnie) DetailScreen
+2. **ViewModel (MainViewModel)**
+   - zarządzanie stanem i logiką UI
+3. **Repository**
+   - komunikacja z bazą danych Room
+4. **Room**
+   - trwały zapis i odczyt danych
 
-UI reaguje na zmiany automatycznie dzięki `collectAsState()` + `Flow`.
+### Przepływ danych:
+- Room → Flow → ViewModel (StateFlow) → UI (collectAsState)
+
+---
+
+## 🧬 Model danych
+
+### Measurement (Pomiar)
+Przykładowe pola:
+- `id: Long`
+- `timestampMs: Long`
+- `lat: Double?`
+- `lon: Double?`
+- `soundDbApprox: Double`
+- `accelMagnitude: Double`
+- `zoneId: Long?`
+- `photoUri: String?`
+
+### Zone (Strefa)
+Przykładowe pola:
+- `id: Long`
+- `name: String`
+- `lat: Double`
+- `lon: Double`
+- `radiusMeters: Double`
+- `maxNoiseDb: Double`
+- `maxAccel: Double`
 
 ---
 
 ## 🔐 Uprawnienia
 
-Aplikacja obsługuje runtime permissions:
+Aplikacja wymaga runtime permissions:
 
 - `ACCESS_FINE_LOCATION`
 - `ACCESS_COARSE_LOCATION`
 - `RECORD_AUDIO`
 - `CAMERA`
 
-W `AndroidManifest.xml` użyto też:
+W `AndroidManifest.xml` użyto również:
 
 ```xml
 <uses-feature android:name="android.hardware.microphone" android:required="false"/>

@@ -85,12 +85,12 @@ Dashboard to “centrum dowodzenia” – pokazuje dane live, przetworzone staty
 - liczba alertów dzisiaj
 - AVG / MIN / MAX hałasu
 
-**(E) Najgłośniejszy pomiar dnia (UX “bajer”)**
+**(E) Najgłośniejszy pomiar dnia (UX)**
 - godzina
 - dB
 - strefa
-- miniatura zdjęcia (jeśli jest)
-- kliknięcie może przenosić do szczegółów (jeśli używasz Detail)
+- miniatura zdjęcia
+- kliknięcie może przenosić do szczegółów
 
 **(F) Wykres hałasu (ostatnie 20 zapisów)**
 - mini wykres w Compose
@@ -100,11 +100,6 @@ Dashboard to “centrum dowodzenia” – pokazuje dane live, przetworzone staty
 - `Zapisz pomiar` (bez zdjęcia)
 - `Foto + zapis` (kamera)
 - `Eksport CSV`
-
-#### Logika przewijania (scroll)
-Jeżeli Dashboard jest “ciężki” do scrollowania, zalecane jest:
-- użyć `LazyColumn` zamiast `Column`
-- albo `Column(modifier = Modifier.verticalScroll(rememberScrollState()))`
 
 W projekcie można łatwo przełączyć na `LazyColumn`, aby UI było płynniejsze na słabszych telefonach.
 
@@ -120,7 +115,7 @@ Historia to lista pomiarów w kolejności od najnowszego. Każdy rekord ma:
 - GPS
 - dB
 - |a|
-- miniaturę zdjęcia (jeśli dodane)
+- miniaturę zdjęcia (jeśli dodane przez użytkownika)
 
 #### Filtr “Tylko alerty 🚨”
 Przełącznik `Switch`:
@@ -136,8 +131,6 @@ Historia umożliwia eksport aktualnie wyświetlonej listy (czyli z filtrem lub b
 ---
 
 ### 🟣 3.3 Strefy
-
-Strefy to funkcja “bardziej projektowa”, bo wprowadza logikę przestrzenną.
 
 Użytkownik może dodać strefę na podstawie aktualnego GPS i ustawić progi:
 
@@ -179,7 +172,7 @@ Alerty są obliczane i wyświetlane w:
 - Strefy: `alerty dziś per strefa`
 
 ### 4.3 Alert log – liczenie przekroczeń
-Dodatkowa wartość projektu: zliczanie liczby przekroczeń progu daje “przetwarzanie danych” i spełnia wymagania PAM mocniej.
+Dodatkowa wartość projektu: zliczanie liczby przekroczeń progu daje przetwarzanie danych.
 
 ---
 
